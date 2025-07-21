@@ -1,0 +1,12 @@
+services:
+  mysql:
+    image: mysql
+    ports:
+      - "3306:3306"  #mysql roda nessa porta
+    expose:
+      - "3306"  #para expor a porta
+    environment:  #variáveis de ambiente
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123
+      - MYSQL_DATABASE=mydb
+      - MYSQL_ROOT_PASSWORD=123

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "tb_roles")
 public class Role {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Gerar automaticamente
     @Column(name = "role_id")
