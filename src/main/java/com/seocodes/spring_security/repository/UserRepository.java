@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+// Repository: camada de acesso a dados, responsável pela comunicação com o banco de dados para realizar operações como o CRUD
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 }
