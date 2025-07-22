@@ -15,7 +15,7 @@ public class SecurityConfig {
     @Bean  // Bean = objeto controlado pelo Spring IoC (um objeto comum do Java, mas as configs, ciclo de vida e dependências são manipuladas pelo Spring)
     private SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // Todas as requisições precisam ser autenticadas
+        // Todas as requisições precisam ser autenticadas para serem processadas
         http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())  // Só é legal pra facilitar testes em ambiente local, não fazer em produção
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())) // Indica que vai usar o JWT - com configurações padrões
