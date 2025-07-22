@@ -1,17 +1,36 @@
 package com.seocodes.spring_security.config;
 
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 @EnableWebSecurity
 // Coloca "interceptadores"/filtros (autenticação, autorização e outras configurações) antes das requisições chegarem nos controllers
 public class SecurityConfig {
+
+    @Value("${jwt.public.key}")  // Aponta para o application.properties
+    private RSAPublicKey publicKey;
+
+    @Value("${jwt.private.key}")  // Aponta para o application.properties
+    private RSAPrivateKey privateKey;
+
     @Bean  // Bean = objeto controlado pelo Spring IoC (um objeto comum do Java, mas as configs, ciclo de vida e dependências são manipuladas pelo Spring)
     private SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -23,6 +42,21 @@ public class SecurityConfig {
 //Stateless: o servidor não precisa manter o estado da sessão do usuário. Em vez disso, o token contém todas as informações necessárias para autenticação e autorização, sendo armazenado no cliente (geralmente no navegador).
 
         return http.build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(){
+        // Criando o decoder a partir da chave pública
+        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder(){
+        // JWK é como se fosse a chave do JWT, pra depois fazer o encoding. Bem complexozinho
+        JWK jwk = new RSAKey.Builder(this.publicKey).privateKey(privateKey).build();
+        var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+
+        return new NimbusJwtEncoder(jwks);
     }
 
 }
