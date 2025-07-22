@@ -7,10 +7,12 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -24,7 +26,6 @@ import java.security.interfaces.RSAPublicKey;
 @EnableWebSecurity
 // Coloca "interceptadores"/filtros (autenticação, autorização e outras configurações) antes das requisições chegarem nos controllers
 public class SecurityConfig {
-
     @Value("${jwt.public.key}")  // Aponta para o application.properties
     private RSAPublicKey publicKey;
 
@@ -32,10 +33,12 @@ public class SecurityConfig {
     private RSAPrivateKey privateKey;
 
     @Bean  // Bean = objeto controlado pelo Spring IoC (um objeto comum do Java, mas as configs, ciclo de vida e dependências são manipuladas pelo Spring)
-    private SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         // Todas as requisições precisam ser autenticadas para serem processadas
-        http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+        http.authorizeHttpRequests(authorize ->
+                        authorize.requestMatchers(HttpMethod.POST,"/login").permitAll() // Definir que a rota /login não precisa de autenticação
+                        .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())  // Só é legal pra facilitar testes em ambiente local, não fazer em produção
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())) // Indica que vai usar o JWT - com configurações padrões
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Sessão STATELESS pois estamos usando o JWT (que é STATELESS)
@@ -52,11 +55,16 @@ public class SecurityConfig {
 
     @Bean
     public JwtEncoder jwtEncoder(){
-        // JWK é como se fosse a chave do JWT, pra depois fazer o encoding. Bem complexozinho
+        // JWK é como se fosse a chave do JWT, pra depois fazer o encoding. É bem complexozinho
         JWK jwk = new RSAKey.Builder(this.publicKey).privateKey(privateKey).build();
         var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
 
         return new NimbusJwtEncoder(jwks);
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 }
