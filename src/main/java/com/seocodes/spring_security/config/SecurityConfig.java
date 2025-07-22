@@ -20,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-@Configuration
+@Configuration  // Declara uma classe que define Beans
 @EnableWebSecurity
 // Coloca "interceptadores"/filtros (autenticação, autorização e outras configurações) antes das requisições chegarem nos controllers
 public class SecurityConfig {
