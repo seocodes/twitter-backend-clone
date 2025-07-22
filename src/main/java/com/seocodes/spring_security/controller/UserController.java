@@ -33,6 +33,7 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
+//NUMA BOA PRÁTICA, PARTE DISSO PODIA ESTAR NUMA SERVICE, MAS DEIXA ASSIM PARA SIMPLIFICAR
     @Transactional
     @PostMapping("/users")
         public ResponseEntity<Void> newUser(@RequestBody CreateUserDTO dto){

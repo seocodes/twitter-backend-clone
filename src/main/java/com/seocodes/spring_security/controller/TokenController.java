@@ -32,6 +32,7 @@ public class TokenController {
 
     }
 
+//NUMA BOA PRÁTICA, PARTE DISSO PODIA ESTAR NUMA SERVICE, MAS DEIXA ASSIM PARA SIMPLIFICAR
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest){
         var user = userRepository.findByUsername(loginRequest.username());
