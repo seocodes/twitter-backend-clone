@@ -2,6 +2,7 @@ package com.seocodes.spring_security.controller;
 
 import com.seocodes.spring_security.controller.dto.LoginRequest;
 import com.seocodes.spring_security.controller.dto.LoginResponse;
+import com.seocodes.spring_security.entities.Role;
 import com.seocodes.spring_security.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 @RestController
 public class TokenController {
@@ -40,6 +42,9 @@ public class TokenController {
 
         var now = Instant.now();
         var expiresIn = 300L; // 300 segundos -> 5 minutos
+        var scopes = user.get().getRoles()
+                .stream().map(Role::getName)
+                .collect(Collectors.joining(" "));
 
         // Configuração dos atributos JSON (claims)
         var claims = JwtClaimsSet.builder()
@@ -47,6 +52,7 @@ public class TokenController {
                 .subject(user.get().getUserId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiresIn))
+                .claim("scope",scopes)
                 .build();
 
         // Para realmente ter o token JWT com aqueles claims ali de cima

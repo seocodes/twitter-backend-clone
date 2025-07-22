@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,8 +24,8 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 @Configuration  // Declara uma classe que define Beans
-@EnableWebSecurity
-// Coloca "interceptadores"/filtros (autenticação, autorização e outras configurações) antes das requisições chegarem nos controllers
+@EnableWebSecurity // Coloca "interceptadores"/filtros (autenticação, autorização e outras configurações) antes das requisições chegarem nos controllers
+@EnableMethodSecurity // Para alguns métodos do UserController - Autorização/@PreAuthorize
 public class SecurityConfig {
     @Value("${jwt.public.key}")  // Aponta para o application.properties
     private RSAPublicKey publicKey;
