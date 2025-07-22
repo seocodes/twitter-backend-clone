@@ -1,10 +1,14 @@
 package com.seocodes.spring_security.controller;
 
 import com.seocodes.spring_security.controller.dto.CreateTweetDTO;
+import com.seocodes.spring_security.controller.dto.FeedDTO;
+import com.seocodes.spring_security.controller.dto.FeedItemDTO;
 import com.seocodes.spring_security.entities.Role;
 import com.seocodes.spring_security.entities.Tweet;
 import com.seocodes.spring_security.repository.TweetRepository;
 import com.seocodes.spring_security.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -21,6 +25,20 @@ public class TweetController {
     public TweetController(TweetRepository tweetRepository, UserRepository userRepository){
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<FeedDTO> feed(@RequestParam(value = "page", defaultValue = "0") int page,
+                                        @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        var tweets = tweetRepository.findAll(
+                PageRequest.of(page, pageSize, Sort.Direction.DESC, "creationTimestamp"))
+                .map(tweet -> new FeedItemDTO(
+                        tweet.getTweetId(),
+                        tweet.getContent(),
+                        tweet.getUser().getUsername()));
+
+        return ResponseEntity.ok(new FeedDTO(
+                tweets.getContent(), page, pageSize, tweets.getTotalPages(), tweets.getTotalElements()));
     }
 
 //NUMA BOA PRÁTICA, PARTE DISSO PODIA ESTAR NUMA SERVICE, MAS DEIXA ASSIM PARA SIMPLIFICAR
