@@ -58,7 +58,6 @@ public class TokenController {
 
         // Para realmente ter o token JWT com aqueles claims ali de cima
         var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
         return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn));
     }
 }
